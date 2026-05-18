@@ -829,6 +829,227 @@
       box-shadow:0 8px 0 #d82c86, 0 16px 30px rgba(216,44,134,.22);
     }
 
+  /* ── 미션 지도 ── */
+    .map-header {
+      text-align:center;
+      margin: 8px 0 18px;
+    }
+    .map-header h1 {
+      margin:0;
+      font-size:52px;
+      line-height:.88;
+      color:#6b32d6;
+      text-shadow:0 4px 0 #fff, 0 12px 28px rgba(107,50,214,.2);
+    }
+    .map-header p {
+      margin:12px 0 0;
+      font-family:"Dongle",sans-serif;
+      font-size:30px;
+      color:#7660a6;
+    }
+    .map-card {
+      position:relative;
+      padding:22px 16px 28px;
+      border-radius:42px;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(255,255,255,.9), transparent 28%),
+        linear-gradient(165deg, rgba(255,255,255,.94), rgba(255,248,230,.88));
+      border:3px solid rgba(255,255,255,.9);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .map-card::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 85% 18%, rgba(255,231,106,.35), transparent 22%),
+        radial-gradient(circle at 12% 78%, rgba(116,234,212,.28), transparent 24%);
+      pointer-events:none;
+    }
+    .map-path {
+      position:absolute;
+      left:50%;
+      top:70px;
+      bottom:40px;
+      width:8px;
+      transform:translateX(-50%);
+      border-radius:999px;
+      background:linear-gradient(180deg,#c4b0ff,#8d6bff,#6ee7c8);
+      opacity:.45;
+      z-index:0;
+    }
+    .mission-list {
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+    .mission-node {
+      width:100%;
+      border:0;
+      border-radius:32px;
+      padding:14px 16px;
+      display:grid;
+      grid-template-columns:72px 1fr auto;
+      gap:12px;
+      align-items:center;
+      text-align:left;
+      font-family:"Jua",sans-serif;
+      color:var(--ink);
+      cursor:pointer;
+      position:relative;
+      transition:transform .2s ease, filter .2s ease;
+    }
+    .mission-node:nth-child(odd) { margin-right:18px; }
+    .mission-node:nth-child(even) { margin-left:18px; }
+    .mission-node:active:not(:disabled) { transform:scale(.98); }
+    .mission-node.locked {
+      cursor:not-allowed;
+      filter:saturate(.55) brightness(1.05);
+      opacity:.78;
+    }
+    .mission-node.completed::after {
+      content:"클리어!";
+      position:absolute;
+      right:14px;
+      top:10px;
+      padding:4px 12px;
+      border-radius:999px;
+      background:linear-gradient(145deg,#79ef8e,#2cc965);
+      color:#fff;
+      font-size:17px;
+      text-shadow:0 1px 0 rgba(0,0,0,.12);
+    }
+    .mission-node[data-theme="forest"] {
+      background:linear-gradient(145deg,#fff,#d4ffd8);
+      box-shadow:0 8px 0 #3cb86a, 0 16px 28px rgba(60,184,106,.18);
+    }
+    .mission-node[data-theme="cave"] {
+      background:linear-gradient(145deg,#fff,#ecdcff);
+      box-shadow:0 8px 0 #9b6bff, 0 16px 28px rgba(123,86,230,.18);
+    }
+    .mission-node[data-theme="village"] {
+      background:linear-gradient(145deg,#fff,#ffe8c8);
+      box-shadow:0 8px 0 #e8a04a, 0 16px 28px rgba(232,160,74,.18);
+    }
+    .mission-node[data-theme="sea"] {
+      background:linear-gradient(145deg,#fff,#d8f4ff);
+      box-shadow:0 8px 0 #4eb8e8, 0 16px 28px rgba(78,184,232,.18);
+    }
+    .mission-icon {
+      width:72px;
+      height:72px;
+      border-radius:28px;
+      display:grid;
+      place-items:center;
+      font-size:38px;
+      background:rgba(255,255,255,.72);
+      box-shadow:inset 0 -4px 10px rgba(0,0,0,.06);
+    }
+    .mission-node h3 { margin:0; font-size:30px; line-height:.92; }
+    .mission-node p {
+      margin:6px 0 0;
+      font-family:"Dongle",sans-serif;
+      font-size:26px;
+      line-height:.88;
+      color:#7660a6;
+    }
+    .mission-progress {
+      font-size:22px;
+      color:#8a52ff;
+      white-space:nowrap;
+      padding-right:4px;
+    }
+    .mission-node.locked .mission-progress { color:#a39bc4; }
+    .lock-badge {
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.75);
+      font-size:22px;
+    }
+    .map-hero {
+      display:flex;
+      justify-content:center;
+      margin: 0 0 10px;
+    }
+    .map-hero img, .map-hero .map-char {
+      width:120px;
+      height:120px;
+      filter:drop-shadow(0 12px 18px rgba(86,56,145,.22));
+    }
+    .map-char {
+      font-size:88px;
+      line-height:1;
+      animation: float 3.2s ease-in-out infinite;
+    }
+
+    .complete-overlay {
+      position:fixed;
+      inset:0;
+      z-index:130;
+      display:none;
+      place-items:center;
+      padding:20px;
+      background:linear-gradient(145deg,rgba(194,239,255,.9),rgba(236,211,255,.92));
+      backdrop-filter:blur(14px);
+    }
+    .complete-overlay.show { display:grid; }
+    .complete-card {
+      width:min(420px,100%);
+      border-radius:42px;
+      padding:30px 24px;
+      text-align:center;
+      background:rgba(255,255,255,.94);
+      border:3px solid rgba(255,255,255,.9);
+      box-shadow:var(--shadow);
+      animation: pageIn .35s ease both;
+    }
+    .complete-card .trophy { font-size:72px; margin-bottom:8px; }
+    .complete-card h2 {
+      margin:0;
+      font-size:44px;
+      color:#6b32d6;
+      text-shadow:0 2px 0 #fff;
+    }
+    .complete-card p {
+      margin:14px 0 22px;
+      font-family:"Dongle",sans-serif;
+      font-size:30px;
+      color:#7660a6;
+    }
+    .complete-actions {
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .complete-actions button {
+      border:0;
+      border-radius:28px;
+      padding:15px 22px;
+      font-family:"Jua",sans-serif;
+      font-size:28px;
+      cursor:pointer;
+    }
+  .btn-primary {
+      color:#fff;
+      background:linear-gradient(180deg,#ff85ca,#ff4caf);
+      box-shadow:0 8px 0 #d82c86, 0 16px 28px rgba(216,44,134,.2);
+    }
+    .btn-secondary {
+      color:#6b32d6;
+      background:linear-gradient(145deg,#fff,#f0e8ff);
+      box-shadow:0 7px 0 #b889ef, 0 14px 24px rgba(86,56,145,.14);
+    }
+
+    body.theme-cave .world-title { color:#8b52ff; }
+    body.theme-village .world-title { color:#e88a2e; }
+    body.theme-sea .world-title { color:#2a9fd4; }
+
     @media (max-width:420px) {
       .world-title { font-size:50px; }
       .instruction { font-size:28px; }
@@ -841,8 +1062,11 @@
       .reward { padding-right:90px; }
       .reward h3 { font-size:32px; }
       .sticker-pack { font-size:25px; right:13px; }
+      .map-header h1 { font-size:44px; }
+      .mission-node:nth-child(odd), .mission-node:nth-child(even) { margin:0; }
     }
   </style>
+  <script src="js/questions.js"></script>
 </head>
 
 <body>
@@ -861,16 +1085,28 @@
 
   <div class="confetti" id="confetti"></div>
 
+  <div class="complete-overlay" id="completeOverlay">
+    <div class="complete-card">
+      <div class="trophy">🏆</div>
+      <h2 id="completeTitle">미션 클리어!</h2>
+      <p id="completeDesc">50문제를 모두 풀었어요!</p>
+      <div class="complete-actions">
+        <button class="btn-primary" id="btnNextMission" onclick="goNextMission()">다음 미션 가기 ✨</button>
+        <button class="btn-secondary" onclick="closeCompleteAndMap()">탐험 지도로</button>
+      </div>
+    </div>
+  </div>
+
   <div class="start-overlay" id="startOverlay">
     <div class="start-card">
       <h1>글자탐험대</h1>
-      <p>공룡 친구가 문제를 읽어줘요.<br>정답을 맞히면 축하음과 스티커가 나와요!</p>
-      <button class="start-btn" onclick="startApp()">학습 시작하기 ✨</button>
+      <p>탐험 지도에서 미션을 하나씩 깨요!<br>미션을 클리어하면 다음 세계가 열려요.</p>
+      <button class="start-btn" onclick="startApp()">탐험 시작하기 ✨</button>
     </div>
   </div>
 
   <main class="app">
-    <section id="lesson" class="screen active">
+    <section id="lesson" class="screen">
       <div class="top-row">
         <button class="circle-btn" onclick="showScreen('home')">‹</button>
         <div class="level-badge">1단계</div>
@@ -903,7 +1139,7 @@
       <div class="progress-box">
         <div class="star-coin">⭐</div>
         <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
-        <div class="progress-count" id="count">1/5</div>
+        <div class="progress-count" id="count">1/50</div>
       </div>
 
       <div class="question-card">
@@ -922,32 +1158,22 @@
       </div>
     </section>
 
-    <section id="home" class="screen">
-      <div class="home-card">
-        <h2>오늘은 어디로<br>떠나볼까?</h2>
-        <button class="world" onclick="openLesson('dino')">
-          <div class="world-icon">🦖</div>
-          <div><h3>공룡숲</h3><p>자음 소리 찾기</p></div>
-        </button>
-        <button class="world" onclick="openLesson('block')">
-          <div class="world-icon">🧱</div>
-          <div><h3>블록동굴</h3><p>자음+모음 조합하기</p></div>
-        </button>
-        <button class="world" onclick="openLesson('ham')">
-          <div class="world-icon">🐹</div>
-          <div><h3>햄찌마을</h3><p>그림 보고 단어 찾기</p></div>
-        </button>
-        <button class="world" onclick="openLesson('sea')">
-          <div class="world-icon">🦈</div>
-          <div><h3>바다왕국</h3><p>고래상어와 단어 읽기</p></div>
-        </button>
+    <section id="home" class="screen active">
+      <div class="map-header">
+        <h1>탐험 지도 🗺️</h1>
+        <p>미션을 클리어하면 다음 세계가 열려요!</p>
+      </div>
+      <div class="map-hero"><div class="map-char" id="mapChar">🦖</div></div>
+      <div class="map-card">
+        <div class="map-path" aria-hidden="true"></div>
+        <div class="mission-list" id="missionList"></div>
       </div>
     </section>
 
     <section id="review" class="screen">
       <div class="panel">
         <h2>복습 상자 🎁</h2>
-        <p>틀렸던 글자를 다시 만나볼 수 있어요. 다음 버전에서 자동 복습 기능을 연결하면 좋아요.</p>
+        <p>클리어한 미션을 다시 연습할 수 있어요.</p>
         <button class="world" onclick="openLesson('dino')">
           <div class="world-icon">⭐</div>
           <div><h3>오늘의 복습</h3><p>자주 틀리는 글자 다시 풀기</p></div>
@@ -963,280 +1189,19 @@
           <div class="stat"><strong id="statSolved">0</strong><span>푼 문제</span></div>
           <div class="stat"><strong id="statCorrect">0</strong><span>정답</span></div>
           <div class="stat"><strong id="statRate">0%</strong><span>정답률</span></div>
-          <div class="stat"><strong id="statStars">0</strong><span>스티커</span></div>
+          <div class="stat"><strong id="statMissions">0/4</strong><span>클리어 미션</span></div>
         </div>
       </div>
     </section>
   </main>
 
   <nav class="tabbar">
-    <button class="tab" onclick="showScreen('home')"><span>🏠</span>홈</button>
-    <button class="tab active" onclick="showScreen('lesson')"><span>📖</span>학습</button>
+    <button class="tab active" onclick="showScreen('home')"><span>🗺️</span>지도</button>
+    <button class="tab" onclick="showScreen('lesson')"><span>📖</span>학습</button>
     <button class="tab" onclick="showScreen('review')"><span>⭐</span>복습</button>
     <button class="tab" onclick="showScreen('parent')"><span>😊</span>부모</button>
   </nav>
 
-  <script>
-    const lessons = {
-      dino: {
-        title: "공룡숲",
-        desc: "자음 소리를 듣고 맞는 글자를 골라요.",
-        level: "1단계",
-        items: [
-          { q:"ㄱ", prompt:"“기역”은 어디 있을까?", choices:["ㄹ","ㄴ","ㄱ","ㅁ"], answer:"ㄱ", speak:"기역은 어디 있을까?" },
-          { q:"ㄴ", prompt:"“니은”은 어디 있을까?", choices:["ㄹ","ㄴ","ㅅ","ㅇ"], answer:"ㄴ", speak:"니은은 어디 있을까?" },
-          { q:"ㄷ", prompt:"“디귿”을 골라볼까?", choices:["ㅂ","ㅈ","ㄷ","ㅎ"], answer:"ㄷ", speak:"디귿을 골라볼까?" },
-          { q:"ㅁ", prompt:"“미음”은 어디 있을까?", choices:["ㅁ","ㄱ","ㅊ","ㅋ"], answer:"ㅁ", speak:"미음은 어디 있을까?" },
-          { q:"ㅅ", prompt:"“시옷”을 찾아볼까?", choices:["ㅇ","ㅅ","ㄹ","ㅍ"], answer:"ㅅ", speak:"시옷을 찾아볼까?" }
-        ]
-      },
-      block: {
-        title:"블록동굴",
-        desc:"자음과 모음을 합쳐 글자를 만들어요.",
-        level:"2단계",
-        items:[
-          { q:"ㄱ + ㅏ", prompt:"합치면 어떤 글자가 될까?", choices:["가","거","고","구"], answer:"가", speak:"기역과 아를 합치면 어떤 글자일까?" },
-          { q:"ㄴ + ㅏ", prompt:"합치면 어떤 글자가 될까?", choices:["다","나","마","라"], answer:"나", speak:"니은과 아를 합치면 어떤 글자일까?" },
-          { q:"ㄷ + ㅏ", prompt:"합치면 어떤 글자가 될까?", choices:["바","다","사","자"], answer:"다", speak:"디귿과 아를 합치면 어떤 글자일까?" },
-          { q:"ㅁ + ㅏ", prompt:"합치면 어떤 글자가 될까?", choices:["마","머","모","무"], answer:"마", speak:"미음과 아를 합치면 어떤 글자일까?" }
-        ]
-      },
-      ham: {
-        title:"햄찌마을",
-        desc:"그림을 보고 단어를 골라요.",
-        level:"3단계",
-        items:[
-          { q:"🍎", prompt:"사과의 첫 글자는?", choices:["사","마","나","가"], answer:"사", speak:"사과의 첫 글자는 무엇일까?" },
-          { q:"🌳", prompt:"나무의 첫 글자는?", choices:["나","다","마","바"], answer:"나", speak:"나무의 첫 글자는 무엇일까?" },
-          { q:"⭐", prompt:"별의 글자는?", choices:["벌","별","발","불"], answer:"별", speak:"별의 글자는 무엇일까?" },
-          { q:"🍚", prompt:"밥의 글자는?", choices:["밥","밤","방","발"], answer:"밥", speak:"밥의 글자는 무엇일까?" }
-        ]
-      },
-      sea: {
-        title:"바다왕국",
-        desc:"고래상어와 낱말을 읽어요.",
-        level:"4단계",
-        items:[
-          { q:"고래", prompt:"같은 단어를 찾아줘!", choices:["고래","거래","노래","고리"], answer:"고래", speak:"고래와 같은 단어를 찾아줘." },
-          { q:"바다", prompt:"같은 단어를 찾아줘!", choices:["보다","바다","마다","바보"], answer:"바다", speak:"바다와 같은 단어를 찾아줘." },
-          { q:"상어", prompt:"같은 단어를 찾아줘!", choices:["상어","상자","사자","상추"], answer:"상어", speak:"상어와 같은 단어를 찾아줘." },
-          { q:"파도", prompt:"같은 단어를 찾아줘!", choices:["파도","파리","포도","파란"], answer:"파도", speak:"파도와 같은 단어를 찾아줘." }
-        ]
-      }
-    };
-
-    let current = lessons.dino;
-    let index = 0;
-    let solved = Number(localStorage.getItem("solved") || 0);
-    let correct = Number(localStorage.getItem("correct") || 0);
-    let audioCtx = null;
-    let soundUnlocked = false;
-    let autoSpeak = true;
-
-    function startApp() {
-      document.getElementById("startOverlay").style.display = "none";
-      unlockAudio();
-      soundUnlocked = true;
-      render();
-      setTimeout(() => speakQuestion(true), 450);
-    }
-
-    function unlockAudio() {
-      try {
-        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === "suspended") audioCtx.resume();
-        playTinyUnlockSound();
-      } catch(e) {}
-    }
-
-    function playTinyUnlockSound() {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.frequency.value = 1;
-      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.02);
-    }
-
-    function showScreen(id) {
-      unlockAudio();
-      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      const order = ["home","lesson","review","parent"];
-      document.querySelectorAll(".tab")[order.indexOf(id)].classList.add("active");
-      updateStats();
-      if (id === "lesson" && soundUnlocked) setTimeout(() => speakQuestion(true), 400);
-    }
-
-    function openLesson(key) {
-      unlockAudio();
-      current = lessons[key] || lessons.dino;
-      index = 0;
-      document.getElementById("lessonTitle").textContent = current.title;
-      document.getElementById("lessonDesc").textContent = current.desc;
-      document.querySelector(".level-badge").textContent = current.level || "1단계";
-      showScreen("lesson");
-      render();
-      setTimeout(() => speakQuestion(true), 500);
-    }
-
-    function render() {
-      const item = current.items[index];
-      document.getElementById("questionText").textContent = item.q;
-      document.getElementById("promptText").textContent = item.prompt;
-      document.getElementById("reward").classList.remove("show");
-      document.getElementById("progress").style.width = ((index + 1) / current.items.length * 100) + "%";
-      document.getElementById("count").textContent = `${index + 1}/${current.items.length}`;
-      document.getElementById("speechBubble").innerHTML = "잘하고<br>있어요! 💕";
-
-      const box = document.getElementById("choices");
-      box.innerHTML = "";
-      item.choices.forEach(c => {
-        const btn = document.createElement("button");
-        btn.className = "choice";
-        btn.textContent = c;
-        btn.onclick = () => answer(btn, c, item.answer);
-        box.appendChild(btn);
-      });
-
-      if (autoSpeak && soundUnlocked && document.getElementById("lesson").classList.contains("active")) {
-        setTimeout(() => speakQuestion(true), 420);
-      }
-    }
-
-    function speakQuestion(cancelFirst = true) {
-      const item = current.items[index];
-      if (!("speechSynthesis" in window)) return;
-      if (cancelFirst) window.speechSynthesis.cancel();
-
-      const utter = new SpeechSynthesisUtterance(item.speak || item.prompt);
-      utter.lang = "ko-KR";
-      utter.rate = .82;
-      utter.pitch = 1.22;
-      utter.volume = 1;
-      window.speechSynthesis.speak(utter);
-    }
-
-    function speakText(text, rate = .9, pitch = 1.25) {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "ko-KR";
-      utter.rate = rate;
-      utter.pitch = pitch;
-      utter.volume = 1;
-      window.speechSynthesis.speak(utter);
-    }
-
-    function answer(btn, choice, ans) {
-      unlockAudio();
-      document.querySelectorAll(".choice").forEach(b => b.disabled = true);
-      solved++;
-
-      if (choice === ans) {
-        correct++;
-        btn.classList.add("correct");
-        document.getElementById("rewardTitle").innerHTML = '우와! <span>정답이에요!</span>';
-        document.getElementById("rewardText").textContent = "스티커 2개를 받았어요! ✨";
-        document.getElementById("speechBubble").innerHTML = "정말<br>잘했어! 💖";
-        document.getElementById("reward").classList.add("show");
-        playSuccessSound();
-        confetti();
-        setTimeout(() => speakText("잘했어! 정답이에요!", .88, 1.35), 220);
-      } else {
-        btn.classList.add("wrong");
-        document.querySelectorAll(".choice").forEach(b => {
-          if (b.textContent === ans) b.classList.add("correct");
-        });
-        document.getElementById("rewardTitle").innerHTML = '아하! <span>정답은 ' + ans + '</span>';
-        document.getElementById("rewardText").textContent = "괜찮아요. 다시 하면 더 잘할 수 있어요!";
-        document.getElementById("speechBubble").innerHTML = "괜찮아<br>다시 해봐! 🌈";
-        document.getElementById("reward").classList.add("show");
-        playSoftWrongSound();
-        setTimeout(() => speakText("괜찮아. 정답은 " + ans + " 이야.", .86, 1.18), 180);
-      }
-
-      localStorage.setItem("solved", solved);
-      localStorage.setItem("correct", correct);
-      updateStats();
-
-      setTimeout(() => {
-        index++;
-        if (index >= current.items.length) index = 0;
-        render();
-      }, 2300);
-    }
-
-    function playSuccessSound() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.5];
-
-      notes.forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, now + i * 0.09);
-        gain.gain.setValueAtTime(0.0001, now + i * 0.09);
-        gain.gain.exponentialRampToValueAtTime(0.18, now + i * 0.09 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.09 + 0.18);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + i * 0.09);
-        osc.stop(now + i * 0.09 + 0.2);
-      });
-    }
-
-    function playSoftWrongSound() {
-      if (!audioCtx) return;
-      const now = audioCtx.currentTime;
-      const notes = [392, 330];
-
-      notes.forEach((freq, i) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(freq, now + i * 0.12);
-        gain.gain.setValueAtTime(0.0001, now + i * 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.09, now + i * 0.12 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.12 + 0.22);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + i * 0.12);
-        osc.stop(now + i * 0.12 + 0.24);
-      });
-    }
-
-    function confetti() {
-      const area = document.getElementById("confetti");
-      area.innerHTML = "";
-      area.classList.add("show");
-      const colors = ["#ff69bc","#ffe56d","#6ee7c8","#9b5cff","#7cb7ff","#ffb84f"];
-      for (let i = 0; i < 54; i++) {
-        const p = document.createElement("i");
-        p.style.left = Math.random() * 100 + "vw";
-        p.style.background = colors[Math.floor(Math.random() * colors.length)];
-        p.style.animationDelay = Math.random() * .38 + "s";
-        p.style.transform = `rotate(${Math.random()*180}deg)`;
-        area.appendChild(p);
-      }
-      setTimeout(() => area.classList.remove("show"), 1300);
-    }
-
-    function updateStats() {
-      const rate = solved ? Math.round(correct / solved * 100) : 0;
-      document.getElementById("statSolved").textContent = solved;
-      document.getElementById("statCorrect").textContent = correct;
-      document.getElementById("statRate").textContent = rate + "%";
-      document.getElementById("statStars").textContent = correct * 2;
-    }
-
-    updateStats();
-    render();
-  </script>
+  <script src="js/game.js"></script>
 </body>
 </html>
