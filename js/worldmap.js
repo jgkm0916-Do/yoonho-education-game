@@ -24,7 +24,10 @@
     logo: assetPath("assets", "logo", "yoonho_logo.png"),
     worldmap: assetPath("assets", "worldmap", "worldmap.png"),
     worldBtnDir: assetPath("assets", "world", "world button"),
+    bgm: assetPath("assets", "audio", "bgm-main.mp3"),
   };
+
+  const BGM_VOLUME = 0.25;
 
   const WORLDS = [
     {
@@ -129,6 +132,8 @@
     "M 24 37 C 34 38, 44 42, 54 43 S 70 34, 86 33 S 76 50, 66 66 S 44 74, 31 76";
 
   let audioCtx = null;
+  let bgm = null;
+  let bgmPlayPending = false;
   let soundEnabled = localStorage.getItem(STORAGE.soundEnabled) !== "false";
   let unlockedStage = clampStage(
     typeof YoonhoProgress !== "undefined"
@@ -231,6 +236,55 @@
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === "suspended") audioCtx.resume();
     } catch (_) {}
+  }
+
+  function initBgm() {
+    if (bgm) return bgm;
+    bgm = new Audio(ASSETS.bgm);
+    bgm.loop = true;
+    bgm.volume = BGM_VOLUME;
+    bgm.preload = "auto";
+    return bgm;
+  }
+
+  function pauseBgm() {
+    if (!bgm) return;
+    bgm.pause();
+  }
+
+  async function startBgm() {
+    if (!soundEnabled) return;
+    const audio = initBgm();
+    if (!audio.paused) return;
+    if (bgmPlayPending) return;
+
+    bgmPlayPending = true;
+    try {
+      unlockAudio();
+      await audio.play();
+    } catch (_) {
+      /* 태블릿 autoplay — 다음 터치에서 재시도 */
+    } finally {
+      bgmPlayPending = false;
+    }
+  }
+
+  function syncBgm() {
+    if (soundEnabled) {
+      startBgm();
+    } else {
+      pauseBgm();
+    }
+  }
+
+  function bindBgmAutoplay() {
+    const onGesture = () => {
+      unlockAudio();
+      if (soundEnabled) startBgm();
+    };
+    document.addEventListener("pointerdown", onGesture, { passive: true });
+    document.addEventListener("touchstart", onGesture, { passive: true });
+    document.addEventListener("keydown", onGesture, { passive: true });
   }
 
   function playTone(freqs, type = "sine", volume = 0.14) {
@@ -349,6 +403,7 @@
   function enterWorld(world, index) {
     if (unlockAnimating) return;
     unlockAudio();
+    pauseBgm();
     playTapSound();
     lastWorldId = world.id;
     localStorage.setItem(STORAGE.lastWorld, world.id);
@@ -508,7 +563,8 @@
         localStorage.setItem(STORAGE.soundEnabled, String(soundEnabled));
         soundBtn.classList.toggle("is-muted", !soundEnabled);
         soundBtn.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
-        playTapSound();
+        syncBgm();
+        if (soundEnabled) playTapSound();
       });
     }
 
@@ -550,6 +606,8 @@
     initPathSvg();
     spawnAmbientParticles();
     bindControls();
+    initBgm();
+    bindBgmAutoplay();
     updateHud();
     syncFromLegacyStorage();
 
@@ -568,13 +626,10 @@
       hideLoader();
       renderWorldNodes();
       checkPendingUnlock();
+      syncBgm();
     });
 
-    document.addEventListener(
-      "pointerdown",
-      () => unlockAudio(),
-      { once: true }
-    );
+    window.addEventListener("pagehide", pauseBgm);
   }
 
   function selectWorld(worldId) {
