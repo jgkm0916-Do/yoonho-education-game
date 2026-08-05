@@ -16,7 +16,8 @@
       <h2>단계 완료!</h2>
       <p id="completeMsg">다음 단계로 갈까요?</p>
       <p id="completeStars" class="complete-stars"></p>
-      <button type="button" class="complete-btn" id="completeBtn">단계 선택으로</button>
+      <button type="button" class="complete-btn" id="completeOtherBtn" hidden>다른 놀이 하기</button>
+      <button type="button" class="complete-btn complete-btn-secondary" id="completeBtn">단계 선택으로</button>
     </div>
   </div>
   <main class="app">
@@ -40,10 +41,16 @@
       <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
       <span class="progress-count" id="count">1/5</span>
     </div>
+    <div class="mode-tabs" id="modeTabs" hidden>
+      <button type="button" class="mode-tab is-active" data-mode="trace" id="tabTrace">따라쓰기</button>
+      <button type="button" class="mode-tab" data-mode="assemble" id="tabAssemble">끌어서 만들기</button>
+    </div>
     <div class="question-card">
       <button type="button" class="sound-btn" id="soundBtn">🔊</button>
       <div class="big-letter" id="questionText">ㄱ</div>
+      <div class="stroke-tip" id="strokeTip" hidden></div>
       <div class="prompt" id="promptText">“기역”은 어디 있을까?</div>
+      <div class="play-area" id="playArea" hidden></div>
     </div>
     <div class="choices" id="choices"></div>
     <div class="reward" id="reward">
@@ -52,6 +59,7 @@
     </div>
   </main>
   <script src="js/progress.js"></script>
+  <script src="js/strokeData.js"></script>
   <script src="js/questionBank.js"></script>
   <script src="js/lesson.js"></script>
 </body>

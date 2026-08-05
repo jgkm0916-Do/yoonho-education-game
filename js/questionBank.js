@@ -91,12 +91,184 @@
     return {
       q: item.q,
       prompt: item.prompt,
-      choices: item.choices,
+      choices: item.choices || [],
       answer: item.answer,
       speak: item.speak || item.prompt,
       type: item.type || "",
+      jamo: item.jamo || "",
+      tip: item.tip || "",
     };
   }
+
+  /** 초보 1단계: 따라쓰기 + 선 조립 (이름 암기 없음) */
+  function pushStrokeLessons(bank, chars) {
+    const strokeApi = global.YoonhoStrokeData;
+    chars.forEach((ch) => {
+      const data = strokeApi && strokeApi.getJamo(ch);
+      if (!data) return;
+      bank.level1.push(
+        q({
+          type: "trace",
+          q: data.char,
+          jamo: data.char,
+          tip: data.tip,
+          prompt: data.char + " 쓰는 순서대로 따라 쓰세요",
+          answer: data.char,
+          speak: data.char + " 를 손가락으로 따라 쓰세요. " + data.tip,
+        })
+      );
+      bank.level1.push(
+        q({
+          type: "assemble",
+          q: data.char,
+          jamo: data.char,
+          tip: data.tip,
+          prompt: "선을 끌어다 " + data.char + " 를 만들어요",
+          answer: data.char,
+          speak: "선을 순서대로 넣어 " + data.char + " 를 만들어요",
+        })
+      );
+    });
+  }
+
+  /** 2단계: 획 선 그림을 보고 글자 고르기 (글자·이름 몰라도 눈으로 비교) */
+  function pushHintPickLessons(levelArr, chars, pool) {
+    const strokeApi = global.YoonhoStrokeData;
+    chars.forEach((ch) => {
+      const data = strokeApi && strokeApi.getJamo(ch);
+      if (!data) return;
+      levelArr.push(
+        q({
+          type: "stroke-see",
+          q: "",
+          jamo: data.char,
+          tip: data.tip,
+          prompt: "이 선으로 만드는 글자는?",
+          choices: pickChoices(ch, pool, 4),
+          answer: ch,
+          speak: "선 그림을 보고 같은 글자를 고르세요",
+        })
+      );
+    });
+  }
+
+  /** 비슷한 글자 구분 (답을 크게 보여주지 않음) */
+  function pushSimilarPickLessons(levelArr, pairs) {
+    pairs.forEach((p) => {
+      levelArr.push(
+        q({
+          type: "similar",
+          q: "🔍",
+          prompt: p.prompt,
+          choices: shuffle(p.choices.slice()),
+          answer: p.answer,
+          speak: p.speak || p.prompt,
+        })
+      );
+    });
+  }
+
+  const SIMILAR_CONSONANTS = [
+    {
+      answer: "ㅌ",
+      choices: ["ㄷ", "ㅌ", "ㄱ", "ㄴ"],
+      prompt: "ㄷ 위에 짧은 가로가 하나 더 있으면?",
+      speak: "ㄷ 위에 획이 하나 더 있는 글자는?",
+    },
+    {
+      answer: "ㅋ",
+      choices: ["ㄱ", "ㅋ", "ㄴ", "ㄷ"],
+      prompt: "ㄱ 가운데에 가로 획이 있으면?",
+      speak: "ㄱ 가운데에 가로가 있는 글자는?",
+    },
+    {
+      answer: "ㅊ",
+      choices: ["ㅈ", "ㅊ", "ㅅ", "ㅇ"],
+      prompt: "ㅈ 위에 점이 있으면?",
+      speak: "ㅈ 위에 점이 있는 글자는?",
+    },
+    {
+      answer: "ㄷ",
+      choices: ["ㄷ", "ㅌ", "ㅁ", "ㄴ"],
+      prompt: "위·왼쪽·아래 가로세로로 ㄷ자 모양이면?",
+      speak: "위 가로, 왼쪽 세로, 아래 가로로 쓰는 글자는?",
+    },
+    {
+      answer: "ㅁ",
+      choices: ["ㅁ", "ㅇ", "ㅂ", "ㄷ"],
+      prompt: "왼쪽 세로 다음, 위·오른쪽으로 꺾어 쓰는 글자는?",
+      speak: "왼쪽 세로 다음 위와 오른쪽으로 쓰는 글자는?",
+    },
+    {
+      answer: "ㅇ",
+      choices: ["ㅇ", "ㅁ", "ㅎ", "ㅅ"],
+      prompt: "한 획으로 둥글게 쓰는 글자는?",
+      speak: "한 획으로 둥글게 쓰는 글자를 고르세요",
+    },
+    {
+      answer: "ㅅ",
+      choices: ["ㅅ", "ㅈ", "ㅇ", "ㄱ"],
+      prompt: "위에서 갈라지는 빗살 모양이면?",
+      speak: "위에서 두 갈래로 내려가는 글자는?",
+    },
+    {
+      answer: "ㄱ",
+      choices: ["ㄱ", "ㄴ", "ㅋ", "ㄷ"],
+      prompt: "가로 먼저, 그다음 아래로 꺾이면?",
+      speak: "가로 다음에 아래로 꺾는 글자는?",
+    },
+  ];
+
+  const SIMILAR_VOWELS = [
+    {
+      answer: "ㅑ",
+      choices: ["ㅏ", "ㅑ", "ㅓ", "ㅣ"],
+      prompt: "ㅏ 에 짧은 가로가 하나 더 있으면?",
+      speak: "아 에 가로가 하나 더 있는 글자는?",
+    },
+    {
+      answer: "ㅕ",
+      choices: ["ㅓ", "ㅕ", "ㅏ", "ㅡ"],
+      prompt: "ㅓ 에 짧은 가로가 하나 더 있으면?",
+      speak: "어 에 가로가 하나 더 있는 글자는?",
+    },
+    {
+      answer: "ㅏ",
+      choices: ["ㅏ", "ㅓ", "ㅗ", "ㅣ"],
+      prompt: "세로 줄에서 오른쪽으로 짧은 가로면?",
+      speak: "세로 다음에 오른쪽으로 긋는 글자는?",
+    },
+    {
+      answer: "ㅓ",
+      choices: ["ㅓ", "ㅏ", "ㅜ", "ㅡ"],
+      prompt: "세로 줄에서 왼쪽으로 짧은 가로면?",
+      speak: "세로 다음에 왼쪽으로 긋는 글자는?",
+    },
+    {
+      answer: "ㅗ",
+      choices: ["ㅗ", "ㅜ", "ㅡ", "ㅏ"],
+      prompt: "가로 줄에서 위로 짧은 세로면?",
+      speak: "가로 다음에 위로 긋는 글자는?",
+    },
+    {
+      answer: "ㅜ",
+      choices: ["ㅜ", "ㅗ", "ㅡ", "ㅣ"],
+      prompt: "가로 줄에서 아래로 짧은 세로면?",
+      speak: "가로 다음에 아래로 긋는 글자는?",
+    },
+    {
+      answer: "ㅣ",
+      choices: ["ㅣ", "ㅡ", "ㅏ", "ㅗ"],
+      prompt: "세로 한 줄만 있으면?",
+      speak: "세로 한 줄 글자는?",
+    },
+    {
+      answer: "ㅡ",
+      choices: ["ㅡ", "ㅣ", "ㅗ", "ㅜ"],
+      prompt: "가로 한 줄만 있으면?",
+      speak: "가로 한 줄 글자는?",
+    },
+  ];
 
   function emptyLevels() {
     return { level1: [], level2: [], level3: [], level4: [], level5: [] };
@@ -115,25 +287,18 @@
   function buildDino() {
     const bank = emptyLevels();
     const allC = CONSONANTS.map((x) => x.c);
-    const allNames = CONSONANTS.map((x) => x.name);
 
-    // 1단계: 글자 보고 이름 맞추기
-    CONSONANTS.forEach((item) => {
-      bank.level1.push(
-        q({
-          type: "shape",
-          q: item.c,
-          prompt: item.c + "은(는) 무엇일까요?",
-          choices: pickChoices(item.name, allNames, 4),
-          answer: item.name,
-          speak: item.c + " 글자의 이름은?",
-        })
-      );
-    });
+    // 1단계: 쉬운 자음 따라쓰기 + 선 조립 (이름 몰라도 OK)
+    const easyC = ["ㄱ", "ㄴ", "ㄷ", "ㅁ", "ㅇ", "ㅅ"];
+    pushStrokeLessons(bank, easyC);
 
-    // 2단계: TTS 소리 듣고 자음 고르기
+    // 2단계: 쓰는 순서 힌트 / 비슷한 글자 구분 (답을 미리 보여주지 않음)
+    pushHintPickLessons(bank.level2, easyC, allC);
+    pushSimilarPickLessons(bank.level2, SIMILAR_CONSONANTS);
+
+    // 3단계: TTS 소리 듣고 자음 고르기
     CONSONANTS.forEach((item) => {
-      bank.level2.push(
+      bank.level3.push(
         q({
           type: "listen",
           q: "🔊",
@@ -141,20 +306,6 @@
           choices: pickChoices(item.c, allC, 4),
           answer: item.c,
           speak: item.name,
-        })
-      );
-    });
-
-    // 3단계: 같은 자음 찾기
-    CONSONANTS.forEach((item) => {
-      bank.level3.push(
-        q({
-          type: "match",
-          q: item.c,
-          prompt: item.c + "와 같은 글자를 고르세요",
-          choices: pickChoices(item.c, allC, 4),
-          answer: item.c,
-          speak: item.c + "와 같은 글자는?",
         })
       );
     });
@@ -175,13 +326,15 @@
       );
     }
 
-    // 5단계: 1~4단계 혼합
-    const mixed = shuffle(
-      bank.level1.concat(bank.level2, bank.level3, bank.level4)
-    );
+    // 5단계: 2~4 혼합
+    const mixed = shuffle(bank.level2.concat(bank.level3, bank.level4));
     mixed.forEach((item) => {
       bank.level5.push({ ...item, type: "mix", prompt: "종합! " + item.prompt });
     });
+    pushStrokeLessons(
+      { level1: bank.level5 },
+      ["ㄱ", "ㄴ", "ㅇ", "ㅂ", "ㅈ"]
+    );
 
     return bank;
   }
@@ -190,20 +343,17 @@
   function buildHamster() {
     const bank = emptyLevels();
     const allV = VOWELS.map((x) => x.v);
-    const allNames = VOWELS.map((x) => x.name);
+
+    // 1단계: 쉬운 모음 따라쓰기 + 선 조립
+    const easyV = ["ㅣ", "ㅡ", "ㅏ", "ㅓ", "ㅗ", "ㅜ"];
+    pushStrokeLessons(bank, easyV);
+
+    // 2단계: 쓰는 순서 힌트 / 비슷한 모음 구분
+    pushHintPickLessons(bank.level2, easyV, allV);
+    pushSimilarPickLessons(bank.level2, SIMILAR_VOWELS);
 
     VOWELS.forEach((item) => {
-      bank.level1.push(
-        q({
-          type: "shape",
-          q: item.v,
-          prompt: item.v + "은(는) 무엇일까요?",
-          choices: pickChoices(item.name, allNames, 4),
-          answer: item.name,
-          speak: item.name,
-        })
-      );
-      bank.level2.push(
+      bank.level3.push(
         q({
           type: "listen",
           q: "🔊",
@@ -211,15 +361,6 @@
           choices: pickChoices(item.v, allV, 4),
           answer: item.v,
           speak: item.name,
-        })
-      );
-      bank.level3.push(
-        q({
-          type: "match",
-          q: item.v,
-          prompt: item.v + "와 같은 모음을 고르세요",
-          choices: pickChoices(item.v, allV, 4),
-          answer: item.v,
         })
       );
     });
@@ -238,9 +379,10 @@
       );
     }
 
-    shuffle(bank.level1.concat(bank.level2, bank.level3, bank.level4)).forEach((item) => {
+    shuffle(bank.level2.concat(bank.level3, bank.level4)).forEach((item) => {
       bank.level5.push({ ...item, type: "mix", prompt: "종합! " + item.prompt });
     });
+    pushStrokeLessons({ level1: bank.level5 }, ["ㅣ", "ㅏ", "ㅗ", "ㅑ", "ㅕ"]);
 
     return bank;
   }
@@ -435,16 +577,32 @@
     return worldBank[lk] ? worldBank[lk].slice() : [];
   }
 
-  /** 단계별 문제 5개 랜덤 출제 */
-  function loadQuestions(worldKey, level, count) {
-    const pool = getLevelPool(worldKey, level);
+  /** 단계별 문제 랜덤 출제. typeFilter가 있으면 해당 type만 */
+  function loadQuestions(worldKey, level, count, typeFilter) {
+    let pool = getLevelPool(worldKey, level);
+    if (typeFilter) {
+      pool = pool.filter((item) => item.type === typeFilter);
+    }
     if (!pool.length) return [];
     if (pool.length <= count) return shuffle(pool);
     return shuffle(pool).slice(0, count);
   }
 
-  function pickSessionQuestions(worldKey, level, count) {
-    return loadQuestions(worldKey, level, count);
+  function poolHasTypes(worldKey, level, types) {
+    const pool = getLevelPool(worldKey, level);
+    return types.every((t) => pool.some((item) => item.type === t));
+  }
+
+  /** 따라쓰기/조립만 있는 단계인지 (탭 분리용) */
+  function isStrokePracticeLevel(worldKey, level) {
+    const pool = getLevelPool(worldKey, level);
+    if (!pool.length) return false;
+    const onlyStroke = pool.every((item) => item.type === "trace" || item.type === "assemble");
+    return onlyStroke && poolHasTypes(worldKey, level, ["trace", "assemble"]);
+  }
+
+  function pickSessionQuestions(worldKey, level, count, typeFilter) {
+    return loadQuestions(worldKey, level, count, typeFilter);
   }
 
   global.YoonhoQuestionBank = {
@@ -454,6 +612,8 @@
     levelKey,
     getLevelPool,
     loadQuestions,
+    poolHasTypes,
+    isStrokePracticeLevel,
     pickSessionQuestions,
   };
 })(typeof window !== "undefined" ? window : globalThis);
