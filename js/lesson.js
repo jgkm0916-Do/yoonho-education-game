@@ -28,10 +28,17 @@
   const params = new URLSearchParams(window.location.search);
   const SESSION_SIZE = 5;
   const NS = "http://www.w3.org/2000/svg";
-  const MODE_LABELS = {
-    trace: "따라쓰기",
-    assemble: "끌어서 만들기",
-  };
+  const MODE_ORDER = ["order-tap", "read-along", "trace", "assemble"];
+
+  function getModeLabels() {
+    const orderLabel = worldKey === "ham" ? "모음 순서" : "자음 순서";
+    return {
+      "order-tap": orderLabel,
+      "read-along": "따라 읽기",
+      trace: "따라쓰기",
+      assemble: "끌어서 만들기",
+    };
+  }
 
   let worldKey = YoonhoProgress.normalizeWorldKey(params.get("world") || "dino");
   let step = Math.max(1, Math.min(5, Number(params.get("step")) || 1));
@@ -40,8 +47,13 @@
   let meta;
   let stepTitles;
   let hasModeTabs = false;
-  let playMode = "trace";
-  let doneModes = { trace: false, assemble: false };
+  let playMode = "order-tap";
+  let doneModes = {
+    "order-tap": false,
+    "read-along": false,
+    trace: false,
+    assemble: false,
+  };
 
   function resolveSession() {
     const urlWorld = params.get("world");
@@ -57,8 +69,8 @@
     hasModeTabs = YoonhoQuestionBank.isStrokePracticeLevel(bankWorld, step);
 
     const urlMode = params.get("mode");
-    if (urlMode === "assemble" || urlMode === "trace") playMode = urlMode;
-    else playMode = "trace";
+    if (MODE_ORDER.indexOf(urlMode) >= 0) playMode = urlMode;
+    else playMode = "order-tap";
 
     localStorage.setItem(STORAGE.currentWorld, bankWorld);
     localStorage.setItem(STORAGE.currentLevel, String(step));
@@ -67,7 +79,7 @@
   }
 
   function startModeSession(mode, doRender) {
-    playMode = mode === "assemble" ? "assemble" : "trace";
+    playMode = MODE_ORDER.indexOf(mode) >= 0 ? mode : "order-tap";
     items = hasModeTabs
       ? YoonhoQuestionBank.loadQuestions(bankWorld, step, SESSION_SIZE, playMode)
       : YoonhoQuestionBank.loadQuestions(bankWorld, step, SESSION_SIZE);
@@ -92,19 +104,31 @@
       return;
     }
     tabs.hidden = false;
+    const labels = getModeLabels();
     tabs.querySelectorAll(".mode-tab").forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.mode === playMode);
+      const mode = btn.dataset.mode;
+      if (labels[mode]) btn.textContent = labels[mode];
+      btn.classList.toggle("is-active", mode === playMode);
     });
   }
 
   function updateModeDescription() {
     if (!stepTitles) return;
     const base = stepTitles[step - 1] || "";
+    const labels = getModeLabels();
     if (hasModeTabs) {
-      $("lessonDesc").textContent = MODE_LABELS[playMode] + " · " + base;
+      $("lessonDesc").textContent = (labels[playMode] || "") + " · " + base;
     } else {
       $("lessonDesc").textContent = base;
     }
+  }
+
+  function nextUndoneMode() {
+    for (let i = 0; i < MODE_ORDER.length; i++) {
+      const m = MODE_ORDER[i];
+      if (!doneModes[m]) return m;
+    }
+    return null;
   }
 
   let index = 0;
@@ -180,11 +204,22 @@
     return item.type === "trace" || item.type === "assemble";
   }
 
-  /** 선 그림 보여 주고 객관식으로 글자 고르기 */
+  function isOrderTap(item) {
+    return item.type === "order-tap" || (item.type === "mix" && Array.isArray(item.cards));
+  }
+
+  function isReadAlong(item) {
+    return item.type === "read-along" || (item.type === "mix" && item.name && item.q && !item.cards);
+  }
+
+  function isLadder(item) {
+    return item.type === "ladder" || (item.type === "mix" && Array.isArray(item.sequence));
+  }
+
   function isStrokeSee(item) {
-    if (isInteractive(item)) return false;
+    if (isInteractive(item) || isLadder(item) || isOrderTap(item) || isReadAlong(item)) return false;
     if (!item || !item.jamo || !(item.choices && item.choices.length)) return false;
-    return item.type === "stroke-see" || item.type === "mix";
+    return item.type === "stroke-see";
   }
 
   function renderStrokePreview(jamo) {
@@ -222,6 +257,273 @@
 
     board.appendChild(svg);
     play.appendChild(board);
+  }
+
+  function renderLadder(item) {
+    const play = $("playArea");
+    play.hidden = false;
+    play.innerHTML = "";
+
+    const seq = (item.sequence || []).slice();
+    const full = item.fullSequence || [];
+    const blankIndices = (item.blankIndices || []).slice().sort((a, b) => a - b);
+
+    const wrap = document.createElement("div");
+    wrap.className = "cloud-path";
+    wrap.innerHTML = '<div class="cloud-path-sky" aria-hidden="true"></div>';
+
+    const row = document.createElement("div");
+    row.className = "cloud-path-row";
+
+    const jumper = document.createElement("div");
+    jumper.className = "cloud-jumper";
+    jumper.setAttribute("aria-hidden", "true");
+    jumper.textContent = "⭐";
+    row.appendChild(jumper);
+
+    seq.forEach((ch, i) => {
+      if (i > 0) {
+        const bridge = document.createElement("div");
+        bridge.className = "cloud-bridge";
+        bridge.setAttribute("aria-hidden", "true");
+        bridge.innerHTML = '<span class="cloud-bridge-dots"></span>';
+        row.appendChild(bridge);
+      }
+
+      const step = document.createElement("div");
+      step.className = "cloud-step";
+      step.dataset.index = String(i);
+
+      const cloud = document.createElement("div");
+      cloud.className = "cloud-bubble";
+      if (ch == null) {
+        step.classList.add("is-blank");
+        cloud.innerHTML = '<span class="ladder-slot">?</span>';
+      } else {
+        cloud.innerHTML = '<span class="ladder-char">' + ch + "</span>";
+      }
+      step.appendChild(cloud);
+
+      const label = document.createElement("div");
+      label.className = "cloud-label";
+      if (i === 0) label.textContent = "시작";
+      else if (i === seq.length - 1) label.textContent = "끝";
+      else label.textContent = String(i + 1);
+      step.appendChild(label);
+
+      row.appendChild(step);
+    });
+
+    wrap.appendChild(row);
+    const hint = document.createElement("div");
+    hint.className = "trace-hint";
+    hint.textContent = "빈 구름에 들어갈 글자를 고르세요";
+    play.appendChild(wrap);
+    play.appendChild(hint);
+
+    let jumpTimer = null;
+
+    function placeJumperOnStep(stepIndex, hopping) {
+      const step = row.querySelector('.cloud-step[data-index="' + stepIndex + '"]');
+      if (!step) return;
+      const bubble = step.querySelector(".cloud-bubble");
+      if (!bubble) return;
+      const rowRect = row.getBoundingClientRect();
+      const bubbleRect = bubble.getBoundingClientRect();
+      const x = bubbleRect.left - rowRect.left + bubbleRect.width / 2;
+      const y = bubbleRect.top - rowRect.top - 6;
+      jumper.style.left = x + "px";
+      jumper.style.top = y + "px";
+      jumper.classList.toggle("is-hopping", !!hopping);
+    }
+
+    function parkStarOnBlank() {
+      const cur = currentBlankIndex();
+      const target = cur >= 0 ? cur : seq.length - 1;
+      placeJumperOnStep(target, false);
+      jumper.classList.add("is-waiting");
+    }
+
+    function currentBlankIndex() {
+      for (let b = 0; b < blankIndices.length; b++) {
+        const idx = blankIndices[b];
+        if (seq[idx] == null) return idx;
+      }
+      return -1;
+    }
+
+    function refreshSteps() {
+      const cur = currentBlankIndex();
+      row.querySelectorAll(".cloud-step").forEach((step) => {
+        const i = Number(step.dataset.index);
+        step.classList.toggle("is-active", i === cur);
+        const bubble = step.querySelector(".cloud-bubble");
+        if (!bubble) return;
+        if (seq[i] == null) {
+          step.classList.add("is-blank");
+          bubble.innerHTML = '<span class="ladder-slot">?</span>';
+        } else {
+          step.classList.remove("is-blank");
+          bubble.innerHTML = '<span class="ladder-char">' + seq[i] + "</span>";
+        }
+      });
+      hint.textContent = cur < 0 ? "완성!" : "빈 구름에 들어갈 글자를 고르세요";
+      parkStarOnBlank();
+    }
+
+    // 레이아웃 안정화 후 별은 물음표 위에만
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        refreshSteps();
+      });
+    });
+
+    const box = $("choices");
+    box.classList.remove("hidden-choices");
+    box.innerHTML = "";
+    (item.choices || []).forEach((c) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "choice";
+      btn.textContent = c;
+      btn.onclick = () => {
+        if (advancing) return;
+        unlockAudio();
+        const cur = currentBlankIndex();
+        if (cur < 0) return;
+        const expected = full[cur];
+        if (c === expected) {
+          seq[cur] = c;
+          btn.disabled = true;
+          btn.classList.add("correct");
+          refreshSteps();
+          speakText(c);
+          if (currentBlankIndex() < 0) finishInteractive(true);
+        } else {
+          btn.classList.add("wrong");
+          setTimeout(() => btn.classList.remove("wrong"), 450);
+          hint.textContent = "왼쪽부터 순서를 다시 보세요!";
+          speakText("다시 생각해 보세요");
+        }
+      };
+      box.appendChild(btn);
+    });
+
+    interactCleanup = function () {
+      if (jumpTimer) clearInterval(jumpTimer);
+      jumpTimer = null;
+      box.innerHTML = "";
+    };
+  }
+
+  function renderOrderTap(item) {
+    const play = $("playArea");
+    play.hidden = false;
+    play.innerHTML = "";
+    $("choices").classList.add("hidden-choices");
+    $("choices").innerHTML = "";
+
+    const cards = (item.cards || []).slice();
+    let next = 0;
+
+    const grid = document.createElement("div");
+    grid.className = "order-card-grid";
+    const hint = document.createElement("div");
+    hint.className = "trace-hint";
+    hint.textContent = "빛나는 카드를 순서대로 눌러 보세요";
+
+    cards.forEach((ch, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "order-card";
+      btn.textContent = ch;
+      btn.dataset.index = String(i);
+      btn.onclick = () => {
+        if (advancing) return;
+        unlockAudio();
+        const idx = Number(btn.dataset.index);
+        if (idx === next) {
+          btn.classList.add("is-done");
+          btn.classList.remove("is-next");
+          speakText(ch);
+          next += 1;
+          refreshNext();
+          if (next >= cards.length) finishInteractive(true);
+        } else {
+          btn.classList.add("is-wrong");
+          setTimeout(() => btn.classList.remove("is-wrong"), 280);
+          hint.textContent = "순서를 다시 보세요!";
+          speakText("다시 눌러 보세요");
+        }
+      };
+      grid.appendChild(btn);
+    });
+
+    function refreshNext() {
+      grid.querySelectorAll(".order-card").forEach((btn) => {
+        const i = Number(btn.dataset.index);
+        btn.classList.toggle("is-next", i === next);
+      });
+      hint.textContent =
+        next >= cards.length
+          ? "완성!"
+          : "다음 카드: " + cards[next] + " (" + (next + 1) + "/" + cards.length + ")";
+    }
+
+    play.appendChild(grid);
+    play.appendChild(hint);
+    refreshNext();
+
+    interactCleanup = function () {
+      play.innerHTML = "";
+    };
+  }
+
+  function renderReadAlong(item) {
+    const play = $("playArea");
+    play.hidden = false;
+    play.innerHTML = "";
+    $("choices").classList.add("hidden-choices");
+    $("choices").innerHTML = "";
+    $("questionText").classList.remove("hidden-letter");
+    $("questionText").textContent = item.q;
+
+    const box = document.createElement("div");
+    box.className = "read-along-box";
+    const nameEl = document.createElement("div");
+    nameEl.className = "read-along-name";
+    nameEl.textContent = item.name || "";
+    const actions = document.createElement("div");
+    actions.className = "read-along-actions";
+
+    const listenBtn = document.createElement("button");
+    listenBtn.type = "button";
+    listenBtn.className = "read-along-btn listen";
+    listenBtn.textContent = "🔊 다시 듣기";
+    listenBtn.onclick = () => {
+      unlockAudio();
+      speakText(item.name || item.speak);
+    };
+
+    const doneBtn = document.createElement("button");
+    doneBtn.type = "button";
+    doneBtn.className = "read-along-btn done";
+    doneBtn.textContent = "따라 읽었어요!";
+    doneBtn.onclick = () => {
+      if (advancing) return;
+      unlockAudio();
+      finishInteractive(true);
+    };
+
+    actions.appendChild(listenBtn);
+    actions.appendChild(doneBtn);
+    box.appendChild(nameEl);
+    box.appendChild(actions);
+    play.appendChild(box);
+
+    interactCleanup = function () {
+      play.innerHTML = "";
+    };
   }
 
   function clearInteract() {
@@ -262,6 +564,17 @@
       $("playArea").hidden = false;
       if (item.type === "trace") renderTrace(item);
       else renderAssemble(item);
+    } else if (isOrderTap(item)) {
+      $("questionText").classList.add("hidden-letter");
+      $("strokeTip").hidden = true;
+      renderOrderTap(item);
+    } else if (isReadAlong(item)) {
+      $("strokeTip").hidden = true;
+      renderReadAlong(item);
+    } else if (isLadder(item)) {
+      $("questionText").classList.add("hidden-letter");
+      $("strokeTip").hidden = true;
+      renderLadder(item);
     } else if (isStrokeSee(item)) {
       $("questionText").classList.add("hidden-letter");
       $("strokeTip").hidden = true;
@@ -322,7 +635,8 @@
 
     const result = YoonhoProgress.completeStep(worldKey, step, correctCount, items.length);
     const starStr = "★".repeat(result.bestStars) + "☆".repeat(3 - result.bestStars);
-    const modeLabel = hasModeTabs ? MODE_LABELS[playMode] : step + "단계";
+    const labels = getModeLabels();
+    const modeLabel = hasModeTabs ? labels[playMode] : step + "단계";
 
     setMascot("cheer");
     $("completeMsg").textContent =
@@ -341,10 +655,10 @@
     }
 
     const otherBtn = $("completeOtherBtn");
-    const otherMode = playMode === "trace" ? "assemble" : "trace";
-    if (hasModeTabs && !doneModes[otherMode]) {
+    const otherMode = nextUndoneMode();
+    if (hasModeTabs && otherMode) {
       otherBtn.hidden = false;
-      otherBtn.textContent = MODE_LABELS[otherMode] + "도 해보기";
+      otherBtn.textContent = labels[otherMode] + "도 해보기";
       otherBtn.dataset.nextMode = otherMode;
     } else {
       otherBtn.hidden = true;
@@ -819,7 +1133,7 @@
     });
 
     $("completeOtherBtn").addEventListener("click", () => {
-      const next = $("completeOtherBtn").dataset.nextMode || "assemble";
+      const next = $("completeOtherBtn").dataset.nextMode || "read-along";
       startModeSession(next, true);
     });
 
