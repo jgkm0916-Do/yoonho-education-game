@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>윤호의 한글 월드 — 별 상점</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Dongle:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/avatar.css" />
+  <link rel="stylesheet" href="css/store.css" />
+</head>
+<body>
+  <main class="store-app">
+    <header class="store-top">
+      <a class="circle-btn" href="index.html" aria-label="월드맵">‹</a>
+      <div class="store-heading">
+        <h1>별 상점</h1>
+        <p>별을 모아 옷과 장난감을 사요!</p>
+      </div>
+      <div class="store-stars">
+        <span aria-hidden="true">⭐</span>
+        <strong id="starBalance">0</strong>
+      </div>
+    </header>
+
+    <section class="store-preview">
+      <div class="gender-tabs" role="tablist">
+        <button type="button" class="gender-tab is-active" data-gender="boy">남자아이</button>
+        <button type="button" class="gender-tab" data-gender="girl">여자아이</button>
+      </div>
+      <div class="preview-stage" id="avatarPreview"></div>
+      <p class="preview-tip" id="previewTip">분홍 셔츠 · 체크 바지</p>
+    </section>
+
+    <section class="store-slots" id="slotTabs"></section>
+    <section class="store-grid" id="itemGrid"></section>
+    <p class="store-msg" id="storeMsg" hidden></p>
+  </main>
+
+  <script src="js/progress.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/store.js"></script>
+</body>
+</html>

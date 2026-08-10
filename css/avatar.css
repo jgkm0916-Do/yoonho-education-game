@@ -1,0 +1,638 @@
+/* 꾸미기 아바타 — 키즈용 치비 스타일 */
+.avatar {
+  --skin: #ffe0c2;
+  --skin-deep: #f5b892;
+  --cheek: #ff9eb8;
+  --hair-boy: #4a2f18;
+  --hair-boy-light: #7a5230;
+  --hair-girl: #5c2e22;
+  --hair-girl-light: #8a4a38;
+  --ink: #3d2a5c;
+  position: relative;
+  width: 120px;
+  height: 168px;
+  margin: 0 auto;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 14px rgba(86, 56, 145, 0.18));
+}
+
+.avatar--sm { width: 76px; height: 106px; }
+.avatar--md { width: 120px; height: 168px; }
+.avatar--lg { width: 190px; height: 265px; }
+
+.avatar-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 48%;
+  height: 8%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(80, 50, 120, 0.28), transparent 70%);
+}
+
+.avatar-body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-head {
+  position: relative;
+  width: 46%;
+  aspect-ratio: 0.92;
+  margin-top: 4%;
+  z-index: 5;
+}
+
+.avatar-ear {
+  position: absolute;
+  top: 42%;
+  width: 18%;
+  height: 22%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--skin), var(--skin-deep));
+  z-index: 0;
+}
+.avatar-ear.left { left: -2%; }
+.avatar-ear.right { right: -2%; }
+
+.avatar-face {
+  position: absolute;
+  inset: 16% 6% 4%;
+  border-radius: 46% 46% 48% 48%;
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.55) 0 12%, transparent 13%),
+    linear-gradient(180deg, #ffe8d0 0%, var(--skin) 55%, var(--skin-deep) 100%);
+  box-shadow:
+    inset 0 -6px 10px rgba(220, 140, 100, 0.18),
+    0 4px 0 rgba(200, 130, 90, 0.12);
+  z-index: 2;
+  overflow: hidden;
+}
+
+.blush {
+  position: absolute;
+  top: 54%;
+  width: 20%;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff8eb0 0%, transparent 72%);
+  opacity: 0.85;
+}
+.blush.left { left: 10%; }
+.blush.right { right: 10%; }
+
+.brow {
+  position: absolute;
+  top: 30%;
+  width: 15%;
+  height: 5%;
+  border-radius: 999px 999px 40% 40%;
+  background: rgba(90, 50, 40, 0.4);
+}
+.brow.left { left: 22%; transform: rotate(12deg); }
+.brow.right { right: 22%; transform: rotate(-12deg); }
+
+.eye {
+  position: absolute;
+  top: 36%;
+  width: 20%;
+  height: 26%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 48%, #6b45a8 0 40%, #2a1848 42% 100%);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.eye.left { left: 18%; }
+.eye.right { right: 18%; }
+
+/* 웃는 눈: 아래쪽을 살짝 가려 ^.^ 느낌 */
+.eye::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -18%;
+  height: 42%;
+  background: var(--skin);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.eye b {
+  position: absolute;
+  left: 22%;
+  top: 14%;
+  width: 42%;
+  height: 38%;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 2;
+}
+
+.eye em {
+  position: absolute;
+  right: 18%;
+  bottom: 28%;
+  width: 18%;
+  height: 16%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 2;
+}
+
+.mouth {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  width: 28%;
+  height: 16%;
+  transform: translateX(-50%);
+  border-radius: 0 0 60% 60%;
+  background: linear-gradient(180deg, #ff6b92, #e03d66);
+  box-shadow: inset 0 3px 0 rgba(255, 170, 190, 0.55);
+  overflow: hidden;
+}
+
+.mouth span {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 45%;
+  height: 48%;
+  border-radius: 40% 40% 50% 50%;
+  background: #ffb3c8;
+}
+
+.mouth::before {
+  content: "";
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  top: -55%;
+  height: 70%;
+  background: var(--skin);
+  border-radius: 50%;
+}
+
+.avatar-hair {
+  position: absolute;
+  z-index: 1;
+  background: linear-gradient(180deg, var(--hair-boy-light), var(--hair-boy));
+}
+
+.avatar-hair.back {
+  left: 2%;
+  right: 2%;
+  top: 4%;
+  height: 72%;
+  border-radius: 48% 48% 30% 30%;
+  z-index: 1;
+}
+
+.avatar-hair.front {
+  left: 8%;
+  right: 8%;
+  top: 6%;
+  height: 38%;
+  border-radius: 50% 50% 42% 42%;
+  z-index: 7; /* 모자보다 위: 앞머리가 이마에 보이게 */
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.avatar-hair.front::before,
+.avatar-hair.front::after {
+  content: "";
+  position: absolute;
+  top: 55%;
+  width: 24%;
+  height: 80%;
+  background: inherit;
+  border-radius: 45%;
+}
+.avatar-hair.front::before { left: -4%; transform: rotate(-14deg); }
+.avatar-hair.front::after { right: -4%; transform: rotate(14deg); }
+
+.avatar--girl .avatar-hair {
+  background: linear-gradient(180deg, #c48962, #8f5538);
+}
+
+/* 여자: 양갈래(트윈테일) + 짧은 앞머리 */
+.avatar--girl .avatar-hair.back {
+  left: 14%;
+  right: 14%;
+  top: 4%;
+  height: 58%;
+  border-radius: 50% 50% 40% 40%;
+}
+
+.avatar--girl .avatar-hair.back::before,
+.avatar--girl .avatar-hair.back::after {
+  content: "";
+  position: absolute;
+  top: 28%;
+  width: 34%;
+  height: 95%;
+  background: linear-gradient(180deg, #c48962, #8f5538 55%, #7a452e);
+  border-radius: 40% 40% 48% 48%;
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.08);
+}
+
+.avatar--girl .avatar-hair.back::before {
+  left: -38%;
+  transform: rotate(-18deg);
+  transform-origin: top center;
+}
+
+.avatar--girl .avatar-hair.back::after {
+  right: -38%;
+  transform: rotate(18deg);
+  transform-origin: top center;
+}
+
+/* 양갈래 끝 동그라미 + 리본 */
+.avatar--girl .avatar-head::before,
+.avatar--girl .avatar-head::after {
+  content: "";
+  position: absolute;
+  top: 40%;
+  width: 15%;
+  height: 13%;
+  border-radius: 50%;
+  background: #ff6eb8;
+  box-shadow:
+    0 2px 0 #d94c96,
+    0 42px 0 -1px #8f5538,
+    0 46px 0 1px #7a452e;
+  z-index: 6;
+}
+.avatar--girl .avatar-head::before {
+  left: -4%;
+}
+.avatar--girl .avatar-head::after {
+  right: -4%;
+}
+
+.avatar--girl .avatar-hair.front {
+  left: 14%;
+  right: 14%;
+  top: 6%;
+  height: 36%;
+  border-radius: 50% 50% 42% 42%;
+}
+
+.avatar--girl .avatar-hair.front::before,
+.avatar--girl .avatar-hair.front::after {
+  top: 52%;
+  width: 20%;
+  height: 72%;
+  border-radius: 50%;
+}
+.avatar--girl .avatar-hair.front::before {
+  left: -4%;
+  transform: rotate(-12deg);
+}
+.avatar--girl .avatar-hair.front::after {
+  right: -4%;
+  transform: rotate(12deg);
+}
+
+.avatar--girl .avatar-face {
+  inset: 18% 12% 6%;
+}
+
+.avatar-hat {
+  position: absolute;
+  left: 50%;
+  top: -10%;
+  width: 76%;
+  height: 36%;
+  transform: translateX(-50%);
+  z-index: 4; /* 뒷머리 위, 앞머리 아래 */
+}
+
+.avatar-hat[data-style="none"] { display: none; }
+
+.avatar-hat[data-style="red-cap"] {
+  background: linear-gradient(180deg, #ff7a8a, #ff4458);
+  border-radius: 50% 50% 12% 12%;
+  box-shadow: 0 4px 0 #d12f42, inset 0 3px 0 rgba(255, 255, 255, 0.35);
+}
+.avatar-hat[data-style="red-cap"]::after {
+  content: "";
+  position: absolute;
+  left: -14%;
+  right: 8%;
+  bottom: -10%;
+  height: 32%;
+  background: linear-gradient(180deg, #ff7a8a, #ff4458);
+  border-radius: 10px;
+  box-shadow: 0 3px 0 #d12f42;
+}
+
+.avatar-hat[data-style="crown"] {
+  top: -22%;
+  background: linear-gradient(180deg, #fff1a0, #ffc14d);
+  clip-path: polygon(0 72%, 16% 8%, 34% 58%, 50% 0, 66% 58%, 84% 8%, 100% 72%, 100% 100%, 0 100%);
+  box-shadow: 0 3px 0 #e09a2e;
+}
+
+.avatar-hat[data-style="bunny"] {
+  background: transparent;
+}
+.avatar-hat[data-style="bunny"]::before,
+.avatar-hat[data-style="bunny"]::after {
+  content: "";
+  position: absolute;
+  top: -85%;
+  width: 30%;
+  height: 110%;
+  background: linear-gradient(180deg, #fff, #ffe4ef);
+  border: 3px solid #f5b6cb;
+  border-radius: 50%;
+  box-shadow: inset -4px 0 0 rgba(255, 160, 190, 0.35);
+}
+.avatar-hat[data-style="bunny"]::before { left: 8%; transform: rotate(-14deg); }
+.avatar-hat[data-style="bunny"]::after { right: 8%; transform: rotate(14deg); }
+
+.avatar-hat[data-style="star-band"] {
+  top: 10%;
+  height: 16%;
+  background: linear-gradient(180deg, #b894ff, #8151ee);
+  border-radius: 999px;
+  box-shadow: 0 3px 0 #5b32d6;
+}
+.avatar-hat[data-style="star-band"]::before {
+  content: "★";
+  position: absolute;
+  left: 50%;
+  top: -130%;
+  transform: translateX(-50%);
+  color: #ffe56d;
+  font-size: 1.15em;
+  text-shadow: 0 2px 0 #e0b83a;
+}
+
+.avatar-neck {
+  width: 12%;
+  height: 5%;
+  margin-top: -1%;
+  border-radius: 0 0 40% 40%;
+  background: var(--skin-deep);
+  z-index: 3;
+}
+
+.avatar-top {
+  position: relative;
+  width: 50%;
+  height: 27%;
+  margin-top: -1%;
+  z-index: 3;
+  border-radius: 22% 22% 16% 16%;
+  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.35), 0 4px 0 rgba(0, 0, 0, 0.08);
+}
+
+.avatar-top .collar {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  width: 28%;
+  height: 14%;
+  transform: translateX(-50%);
+  border-radius: 0 0 50% 50%;
+  background: rgba(255, 255, 255, 0.45);
+  z-index: 2;
+}
+
+.avatar-top .arm {
+  position: absolute;
+  top: 14%;
+  width: 26%;
+  height: 78%;
+  border-radius: 40%;
+  background: inherit;
+  box-shadow: inherit;
+  z-index: 1;
+}
+
+.avatar-top .arm.left {
+  left: -28%;
+  transform: rotate(22deg);
+  transform-origin: top center;
+}
+
+.avatar-top .arm.right {
+  right: -28%;
+  transform: rotate(-22deg);
+  transform-origin: top center;
+}
+
+.avatar-top .hand {
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  width: 78%;
+  height: 32%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffe8d0, #f5b892);
+  box-shadow: 0 2px 0 rgba(200, 130, 90, 0.25);
+  z-index: 2;
+}
+
+.avatar-top .hand::before,
+.avatar-top .hand::after {
+  content: "";
+  position: absolute;
+  top: 8%;
+  width: 28%;
+  height: 55%;
+  border-radius: 50%;
+  background: inherit;
+  box-shadow: inherit;
+}
+.avatar-top .hand::before { left: -8%; transform: rotate(-25deg); }
+.avatar-top .hand::after { right: -8%; transform: rotate(25deg); }
+
+.avatar-top[data-style="pink"] {
+  background: linear-gradient(180deg, #ffb4de 0%, #ff6ec4 55%, #ff4caf 100%);
+}
+.avatar-top[data-style="blue"] {
+  background: linear-gradient(180deg, #b8e4ff 0%, #6ec4ff 55%, #3aa8f0 100%);
+}
+.avatar-top[data-style="yellow"] {
+  background: linear-gradient(180deg, #fff0a0 0%, #ffd24a 55%, #ffb82e 100%);
+}
+.avatar-top[data-style="stripe"] {
+  background: repeating-linear-gradient(
+    180deg,
+    #fffef8 0 11%,
+    #7cb7ff 11% 22%
+  );
+}
+.avatar-top[data-style="dino"] {
+  background: linear-gradient(180deg, #9af0ad 0%, #45d878 55%, #22b85a 100%);
+}
+.avatar-top[data-style="dino"]::after {
+  content: "🦕";
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  font-size: 0.62em;
+  z-index: 2;
+}
+
+/* 예전 의사 팔(pseudo) 제거 — 실제 .arm/.hand 사용 */
+
+.avatar-bottom {
+  position: relative;
+  width: 46%;
+  height: 25%;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 4%;
+}
+
+.avatar-bottom[data-style="check"] {
+  --pants: #6b5adf;
+  --pants-deep: #5240c4;
+}
+.avatar-bottom[data-style="denim"] {
+  --pants: #6ea8ff;
+  --pants-deep: #3d78e0;
+}
+.avatar-bottom[data-style="green"] {
+  --pants: #6fe09a;
+  --pants-deep: #2faf66;
+}
+.avatar-bottom[data-style="stars"] {
+  --pants: #9b5cff;
+  --pants-deep: #6b32d6;
+}
+
+.avatar-bottom::before,
+.avatar-bottom::after {
+  content: "";
+  width: 48%;
+  height: 100%;
+  border-radius: 12% 12% 28% 28%;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px),
+    linear-gradient(180deg, var(--pants), var(--pants-deep));
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25), 0 3px 0 rgba(0, 0, 0, 0.08);
+}
+
+.avatar-bottom[data-style="check"]::before,
+.avatar-bottom[data-style="check"]::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 50%, transparent 50%),
+    linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.08) 50%),
+    linear-gradient(180deg, var(--pants), var(--pants-deep));
+  background-size: 10px 10px, 10px 10px, auto;
+}
+
+.avatar-bottom[data-style="stars"]::before,
+.avatar-bottom[data-style="stars"]::after {
+  background:
+    radial-gradient(circle at 30% 35%, #ffe56d 0 1.5px, transparent 2px),
+    radial-gradient(circle at 70% 65%, #ffe56d 0 1.5px, transparent 2px),
+    linear-gradient(180deg, var(--pants), var(--pants-deep));
+}
+
+.avatar-shoes {
+  width: 48%;
+  height: 9%;
+  margin-top: -2%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 1;
+}
+.avatar-shoes i {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: 40% 40% 30% 30%;
+  background: linear-gradient(180deg, #6a4f9a, #3d2a5c);
+  box-shadow: 0 3px 0 #2a1c42;
+}
+
+.avatar-bag {
+  position: absolute;
+  right: 2%;
+  top: 48%;
+  width: 24%;
+  height: 20%;
+  z-index: 6;
+  border-radius: 22%;
+}
+.avatar-bag[data-style="none"] { display: none; }
+.avatar-bag[data-style="yellow"] {
+  background: linear-gradient(180deg, #fff0a0, #ffd24a);
+  box-shadow: 0 4px 0 #e0b83a, inset 0 2px 0 rgba(255, 255, 255, 0.5);
+}
+.avatar-bag[data-style="star"] {
+  background: linear-gradient(180deg, #c4a6ff, #8d4df5);
+  box-shadow: 0 4px 0 #6b32d6, inset 0 2px 0 rgba(255, 255, 255, 0.35);
+}
+.avatar-bag[data-style="star"]::after {
+  content: "★";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #ffe56d;
+  font-size: 0.75em;
+  text-shadow: 0 1px 0 #c9a020;
+}
+.avatar-bag[data-style="frog"] {
+  background: linear-gradient(180deg, #9af0ad, #45d878);
+  border-radius: 50%;
+  box-shadow: 0 4px 0 #22b85a, inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+.avatar-bag[data-style="frog"]::before,
+.avatar-bag[data-style="frog"]::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: #45d878;
+}
+.avatar-bag[data-style="frog"]::before { left: 12%; }
+.avatar-bag[data-style="frog"]::after { right: 12%; }
+
+.avatar-toy {
+  position: absolute;
+  left: 0;
+  top: 54%;
+  width: 26%;
+  height: 20%;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  font-size: 1em;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.15));
+  animation: toyBob 2.4s ease-in-out infinite;
+}
+.avatar-toy[data-style="none"] { display: none; }
+.avatar-toy[data-style="ball"]::before { content: "⚽"; }
+.avatar-toy[data-style="bear"]::before { content: "🧸"; }
+.avatar-toy[data-style="wand"]::before { content: "🪄"; }
+.avatar-toy[data-style="car"]::before { content: "🚗"; }
+
+@keyframes toyBob {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-4px) rotate(4deg); }
+}
+
+.avatar--sm .avatar-toy { font-size: 0.6em; }
+.avatar--lg .avatar-toy { font-size: 1.35em; }
+
+.avatar--sm .brow { display: none; }
+.avatar--sm .collar { display: none; }

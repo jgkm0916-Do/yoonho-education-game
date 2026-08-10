@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Jua&family=Dongle:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/worldmap.css" />
+  <link rel="stylesheet" href="css/avatar.css" />
 </head>
 <body>
   <div class="portrait-hint" aria-hidden="true">
@@ -67,10 +68,16 @@
         </div>
       </aside>
 
+      <aside class="hud-avatar" id="hudAvatarWrap">
+        <div class="hud-avatar-stage" id="hudAvatar"></div>
+        <a class="hud-store-btn" href="store.html">옷장 · 상점</a>
+      </aside>
+
       <nav class="hud-right" aria-label="게임 메뉴">
         <button type="button" class="icon-btn icon-btn--subtle" id="resetBtn" aria-label="진행 초기화" title="진행 초기화">↺</button>
         <button type="button" class="icon-btn" id="soundBtn" aria-label="소리 켜기/끄기" title="소리">🔊</button>
         <button type="button" class="icon-btn" id="homeBtn" aria-label="홈" title="홈">🏠</button>
+        <a class="icon-btn icon-btn--store" href="store.html" aria-label="별 상점" title="별 상점">🛍️</a>
       </nav>
 
       </div><!-- world-map-container -->
@@ -95,6 +102,7 @@
       ["assets", "logo", "yoonho_logo.png"].map(encodeURIComponent).join("/");
   </script>
   <script src="js/progress.js"></script>
+  <script src="js/avatar.js"></script>
   <script src="js/worldmap.js"></script>
 </body>
 </html>

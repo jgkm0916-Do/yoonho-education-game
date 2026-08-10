@@ -328,9 +328,11 @@
 
   function updateHud() {
     totalStars =
-      typeof YoonhoProgress !== "undefined"
-        ? YoonhoProgress.syncTotalStars()
-        : Number(localStorage.getItem(STORAGE.totalStars) || 0);
+      typeof YoonhoProgress !== "undefined" && YoonhoProgress.getStarBalance
+        ? YoonhoProgress.getStarBalance()
+        : typeof YoonhoProgress !== "undefined"
+          ? YoonhoProgress.syncTotalStars()
+          : Number(localStorage.getItem(STORAGE.totalStars) || 0);
     unlockedStage = clampStage(
       typeof YoonhoProgress !== "undefined"
         ? YoonhoProgress.getUnlockedMapIndex()
@@ -343,6 +345,13 @@
     const pct = calcProgressPercent();
     if (progressFill) progressFill.style.width = pct + "%";
     if (progressText) progressText.textContent = pct + "%";
+    renderHudAvatar();
+  }
+
+  function renderHudAvatar() {
+    const stage = $("#hudAvatar");
+    if (!stage || typeof YoonhoAvatar === "undefined") return;
+    YoonhoAvatar.renderAvatar(stage, { size: "md" });
   }
 
   function renderWorldNodes() {

@@ -34,6 +34,10 @@
     lastWorld: "lastWorld",
     currentWorld: "currentWorld",
     currentLevel: "currentLevel",
+    spentStars: "spentStars",
+    avatarOwned: "avatarOwned",
+    avatarEquip: "avatarEquip",
+    avatarGender: "avatarGender",
   };
 
   const WORLD_META = {
@@ -177,6 +181,22 @@
     return total;
   }
 
+  function getSpentStars() {
+    return Math.max(0, Number(localStorage.getItem(STORAGE.spentStars) || 0));
+  }
+
+  function getStarBalance() {
+    return Math.max(0, syncTotalStars() - getSpentStars());
+  }
+
+  function spendStars(amount) {
+    const n = Math.max(0, Number(amount) || 0);
+    if (n <= 0) return { ok: true, balance: getStarBalance() };
+    if (getStarBalance() < n) return { ok: false, balance: getStarBalance() };
+    localStorage.setItem(STORAGE.spentStars, String(getSpentStars() + n));
+    return { ok: true, balance: getStarBalance() };
+  }
+
   function completeStep(worldKey, step, correctCount, totalQuestions) {
     const key = normalizeWorldKey(worldKey);
     const stars = calcStars(correctCount, totalQuestions);
@@ -217,6 +237,10 @@
     localStorage.removeItem(STORAGE.worldProgress);
     localStorage.removeItem(STORAGE.worldStars);
     localStorage.removeItem(STORAGE.totalStars);
+    localStorage.removeItem(STORAGE.spentStars);
+    localStorage.removeItem(STORAGE.avatarOwned);
+    localStorage.removeItem(STORAGE.avatarEquip);
+    localStorage.removeItem(STORAGE.avatarGender);
     localStorage.removeItem("completedStages");
     localStorage.removeItem("correct");
     localStorage.removeItem("solved");
@@ -261,6 +285,9 @@
     getStepList,
     getTotalStars,
     syncTotalStars,
+    getSpentStars,
+    getStarBalance,
+    spendStars,
     completeStep,
     calcStars,
     resetAll,
